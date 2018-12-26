@@ -18,16 +18,6 @@ type alias PageData =
     }
 
 
-type alias Query =
-    { search : List PageData
-    }
-
-
-type alias SearchResults =
-    { query : Query
-    }
-
-
 type alias Model =
     { searchValue : String
     , searching : Bool
@@ -48,7 +38,7 @@ init _ =
 type Msg
     = ChangeSearchValue String
     | Search
-    | GotResults (Result Http.Error SearchResults)
+    | GotResults (Result Http.Error (List PageData))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -63,7 +53,7 @@ update msg model =
         GotResults results ->
             case results of
                 Ok value ->
-                    ( { model | searching = False, results = value.query.search }, Cmd.none )
+                    ( { model | searching = False, results = value }, Cmd.none )
 
                 Err _ ->
                     ( { model | searching = False, results = [] }, Cmd.none )
@@ -132,18 +122,12 @@ fetchResults phrase =
         }
 
 
-searchResultsDecoder : D.Decoder SearchResults
+searchResultsDecoder : D.Decoder (List PageData)
 searchResultsDecoder =
-    D.map
-        SearchResults
-        (D.field "query"
-            (D.map Query
-                (D.field "search"
-                    (D.list
-                        (D.map PageData
-                            (D.field "title" D.string)
-                        )
-                    )
-                )
+    D.at
+        [ "query", "search" ]
+        (D.list
+            (D.map PageData
+                (D.field "title" D.string)
             )
         )
