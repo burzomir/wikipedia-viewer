@@ -1,13 +1,13 @@
 module WikipediaViewer exposing (Model, Msg(..), init, main, searchBox, subscriptions, update, view)
 
 import Browser
-import Html exposing (Html, button, div, form, input, li, text, ul, p)
-import Html.Attributes exposing (style)
+import Html exposing (Html, a, button, div, form, input, li, p, text, ul)
+import Html.Attributes exposing (href, style, target)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode as D
-import Url.Builder exposing (crossOrigin, int, string)
 import String.Extra
+import Url.Builder exposing (crossOrigin, int, string)
 
 
 main =
@@ -17,6 +17,7 @@ main =
 type alias PageData =
     { title : String
     , intro : String
+    , id : Int
     }
 
 
@@ -100,10 +101,15 @@ resultsList results =
         []
         (List.map
             (\pageData ->
-                li
-                    []
-                    [ text pageData.title
-                    , p [] [ text (String.Extra.stripTags pageData.intro) ]
+                a
+                    [ href (getPageUrl pageData)
+                    , target "_blank"
+                    ]
+                    [ li
+                        []
+                        [ text pageData.title
+                        , p [] [ text (String.Extra.stripTags pageData.intro) ]
+                        ]
                     ]
             )
             results
@@ -135,8 +141,17 @@ searchResultsDecoder =
     D.at
         [ "query", "search" ]
         (D.list
-            (D.map2 PageData
+            (D.map3 PageData
                 (D.field "title" D.string)
                 (D.field "snippet" D.string)
+                (D.field "pageid" D.int)
             )
         )
+
+
+getPageUrl : PageData -> String
+getPageUrl pageData =
+    crossOrigin
+        "http://en.wikipedia.org"
+        []
+        [ int "curid" pageData.id ]
