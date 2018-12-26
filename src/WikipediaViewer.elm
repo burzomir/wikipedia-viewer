@@ -1,12 +1,14 @@
 module WikipediaViewer exposing (Model, Msg(..), init, main, searchBox, subscriptions, update, view)
 
 import Browser
+import Browser.Dom as Dom
 import Html exposing (Html, a, button, div, form, input, li, p, text, ul)
-import Html.Attributes exposing (href, style, target)
+import Html.Attributes exposing (href, id, style, target)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode as D
 import String.Extra
+import Task
 import Url.Builder exposing (crossOrigin, int, string)
 
 
@@ -34,7 +36,7 @@ init _ =
       , searching = False
       , results = []
       }
-    , Cmd.none
+    , focusSearchBox
     )
 
 
@@ -42,6 +44,7 @@ type Msg
     = ChangeSearchValue String
     | Search
     | GotResults (Result Http.Error (List PageData))
+    | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,6 +63,9 @@ update msg model =
 
                 Err _ ->
                     ( { model | searching = False, results = [] }, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -90,9 +96,21 @@ searchBox value =
         [ onSubmit Search
         , style "textAlign" "center"
         ]
-        [ input [ onInput ChangeSearchValue ] [ text value ]
+        [ input
+            [ onInput ChangeSearchValue
+            , id searchBoxId
+            ]
+            [ text value ]
         , button [] [ text "Search" ]
         ]
+
+
+searchBoxId =
+    "search-box"
+
+
+focusSearchBox =
+    Task.attempt (\_ -> NoOp) (Dom.focus searchBoxId)
 
 
 resultsList : List PageData -> Html Msg
