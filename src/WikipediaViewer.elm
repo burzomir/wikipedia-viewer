@@ -1,12 +1,13 @@
 module WikipediaViewer exposing (Model, Msg(..), init, main, searchBox, subscriptions, update, view)
 
 import Browser
-import Html exposing (Html, button, div, form, input, li, text, ul)
+import Html exposing (Html, button, div, form, input, li, text, ul, p)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode as D
 import Url.Builder exposing (crossOrigin, int, string)
+import String.Extra
 
 
 main =
@@ -15,6 +16,7 @@ main =
 
 type alias PageData =
     { title : String
+    , intro : String
     }
 
 
@@ -97,7 +99,13 @@ resultsList results =
     ul
         []
         (List.map
-            (\pageData -> li [] [ text pageData.title ])
+            (\pageData ->
+                li
+                    []
+                    [ text pageData.title
+                    , p [] [ text (String.Extra.stripTags pageData.intro) ]
+                    ]
+            )
             results
         )
 
@@ -127,7 +135,8 @@ searchResultsDecoder =
     D.at
         [ "query", "search" ]
         (D.list
-            (D.map PageData
+            (D.map2 PageData
                 (D.field "title" D.string)
+                (D.field "snippet" D.string)
             )
         )
