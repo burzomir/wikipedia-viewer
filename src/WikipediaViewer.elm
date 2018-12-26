@@ -77,7 +77,7 @@ view model =
                 [ href getRandomArticleUrl, target "_blank" ]
                 [ text "Random article" ]
             ]
-        , searchBox model.searchValue
+        , searchBox model.searchValue Search ChangeSearchValue
         , p
             [ style "textAlign" "center" ]
             [ text
@@ -97,20 +97,19 @@ subscriptions _ =
     Sub.none
 
 
-searchBox : String -> Html Msg
-searchBox value =
+searchBox : String -> msg -> (String -> msg) -> Html msg
+searchBox value search change =
     form
-        [ onSubmit Search
+        [ onSubmit search
         , style "textAlign" "center"
         ]
         [ input
-            [ onInput ChangeSearchValue
+            [ onInput change
             , id searchBoxId
             ]
             [ text value ]
         , button [] [ text "Search" ]
         ]
-
 
 searchBoxId =
     "search-box"
