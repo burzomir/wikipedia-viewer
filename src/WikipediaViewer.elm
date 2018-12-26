@@ -3,7 +3,7 @@ module WikipediaViewer exposing (Model, Msg(..), init, main, searchBox, subscrip
 import Browser
 import Browser.Dom as Dom
 import Html exposing (Html, a, button, div, form, input, li, p, text, ul)
-import Html.Attributes exposing (href, id, style, target)
+import Html.Attributes exposing (href, id, style, target, type_)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode as D
@@ -71,7 +71,13 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ searchBox model.searchValue
+        [ p
+            [ style "textAlign" "center" ]
+            [ a
+                [ href getRandomArticleUrl, target "_blank" ]
+                [ text "Random article" ]
+            ]
+        , searchBox model.searchValue
         , div []
             [ text
                 (if model.searching then
@@ -175,3 +181,7 @@ getPageUrl pageData =
 
 getWikiUrl =
     crossOrigin "https://en.wikipedia.org"
+
+
+getRandomArticleUrl =
+    getWikiUrl [ "wiki", "Special:Random" ] []
