@@ -77,7 +77,11 @@ view model =
                 [ href getRandomArticleUrl, target "_blank" ]
                 [ text "Random article" ]
             ]
-        , searchBox model.searchValue Search ChangeSearchValue
+        , searchBox
+            { value = model.searchValue
+            , search = Search
+            , change = ChangeSearchValue
+            }
         , p
             [ style "textAlign" "center" ]
             [ text
@@ -97,19 +101,20 @@ subscriptions _ =
     Sub.none
 
 
-searchBox : String -> msg -> (String -> msg) -> Html msg
-searchBox value search change =
+searchBox : { value : String, search : msg, change : String -> msg } -> Html msg
+searchBox props =
     form
-        [ onSubmit search
+        [ onSubmit props.search
         , style "textAlign" "center"
         ]
         [ input
-            [ onInput change
+            [ onInput props.change
             , id searchBoxId
             ]
-            [ text value ]
+            [ text props.value ]
         , button [] [ text "Search" ]
         ]
+
 
 searchBoxId =
     "search-box"
