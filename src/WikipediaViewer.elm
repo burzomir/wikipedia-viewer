@@ -120,8 +120,7 @@ fetchResults : String -> Cmd Msg
 fetchResults phrase =
     let
         url =
-            crossOrigin
-                "http://en.wikipedia.org"
+            getWikiUrl
                 [ "w", "api.php" ]
                 [ string "action" "query"
                 , string "format" "json"
@@ -151,7 +150,10 @@ searchResultsDecoder =
 
 getPageUrl : PageData -> String
 getPageUrl pageData =
-    crossOrigin
-        "http://en.wikipedia.org"
+    getWikiUrl
         []
         [ int "curid" pageData.id ]
+
+
+getWikiUrl =
+    crossOrigin "https://en.wikipedia.org"
