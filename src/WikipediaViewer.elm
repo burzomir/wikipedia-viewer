@@ -54,7 +54,7 @@ update msg model =
             ( { model | searchValue = value }, Cmd.none )
 
         Search ->
-            ( { model | searching = True }, fetchResults model.searchValue )
+            ( { model | searching = True, results = [] }, fetchResults model.searchValue )
 
         GotResults results ->
             case results of
@@ -78,7 +78,8 @@ view model =
                 [ text "Random article" ]
             ]
         , searchBox model.searchValue
-        , div []
+        , p
+            [ style "textAlign" "center" ]
             [ text
                 (if model.searching then
                     "Searching"
