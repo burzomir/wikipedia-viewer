@@ -1,12 +1,15 @@
-module WikipediaViewer exposing (Model, Msg(..), init, main, searchBox, subscriptions, update, view)
+module Main exposing (Model, Msg(..), PageData, fetchResults, focusSearchBox, getPageUrl, getRandomArticleUrl, getWikiUrl, init, main, resultsList, searchBoxId, searchResultsDecoder, subscriptions, update, view)
 
 import Browser
 import Browser.Dom as Dom
-import Html exposing (Html, a, button, div, form, input, li, p, text, ul)
+import Css exposing (..)
+import Html exposing (Html, a, div, li, p, text, ul)
 import Html.Attributes exposing (href, id, style, target, type_)
 import Html.Events exposing (onInput, onSubmit)
+import Html.Styled exposing (toUnstyled)
 import Http
 import Json.Decode as D
+import SearchBox exposing (searchBox)
 import String.Extra
 import Task
 import Url.Builder exposing (crossOrigin, int, string)
@@ -77,11 +80,13 @@ view model =
                 [ href getRandomArticleUrl, target "_blank" ]
                 [ text "Random article" ]
             ]
-        , searchBox
-            { value = model.searchValue
-            , search = Search
-            , change = ChangeSearchValue
-            }
+        , toUnstyled <|
+            searchBox
+                { value = model.searchValue
+                , id = searchBoxId
+                , onChange = ChangeSearchValue
+                , onSearch = Search
+                }
         , p
             [ style "textAlign" "center" ]
             [ text
@@ -99,21 +104,6 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
-
-
-searchBox : { value : String, search : msg, change : String -> msg } -> Html msg
-searchBox props =
-    form
-        [ onSubmit props.search
-        , style "textAlign" "center"
-        ]
-        [ input
-            [ onInput props.change
-            , id searchBoxId
-            ]
-            [ text props.value ]
-        , button [] [ text "Search" ]
-        ]
 
 
 searchBoxId =
