@@ -71,16 +71,11 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ p
-            [ style "textAlign" "center" ]
-            [ a
-                [ href Api.getRandomArticleUrl, target "_blank" ]
-                [ text "Random article" ]
-            ]
-        , toUnstyled <|
+        [ toUnstyled <|
             searchBox
                 { value = model.searchValue
                 , id = searchBoxId
+                , randomArticleUrl = Api.getRandomArticleUrl
                 , onChange = ChangeSearchValue
                 , onSearch = Search
                 }

@@ -2,7 +2,7 @@ module SearchBox exposing (searchBox)
 
 import Css exposing (..)
 import Html.Styled as H exposing (Attribute, Html, styled, text)
-import Html.Styled.Attributes exposing (css, id, placeholder, type_)
+import Html.Styled.Attributes exposing (css, href, id, placeholder, target, type_)
 import Html.Styled.Events exposing (onInput, onSubmit)
 import Icons
 import String exposing (isEmpty)
@@ -12,6 +12,7 @@ import Theme exposing (defaultTheme)
 type alias Model msg =
     { value : String
     , id : String
+    , randomArticleUrl : String
     , onSearch : msg
     , onChange : String -> msg
     }
@@ -20,17 +21,30 @@ type alias Model msg =
 searchBox : Model msg -> H.Html msg
 searchBox model =
     let
-        labelVisible = isEmpty model.value
+        labelVisible =
+            isEmpty model.value
     in
-    form
-        [ onSubmit model.onSearch ]
-        [ input
-            [ onInput model.onChange
-            , id model.id
+    container []
+        [ form
+            [ onSubmit model.onSearch ]
+            [ input
+                [ onInput model.onChange
+                , id model.id
+                ]
+                [ text model.value ]
+            , button [] [ Icons.magnifyingGlass defaultTheme.colors.text ]
+            , label labelVisible [] [ text "Search Wikipedia" ]
             ]
-            [ text model.value ]
-        , button [] [ Icons.magnifyingGlass defaultTheme.colors.text ]
-        , label labelVisible [] [ text "Search Wikipedia" ]
+        , randomArticleLink
+            [ href model.randomArticleUrl, target "_blank" ]
+            [ text "Random article" ]
+        ]
+
+
+container =
+    styled H.div
+        [ backgroundColor defaultTheme.colors.primary
+        , textAlign center
         ]
 
 
@@ -38,7 +52,6 @@ form =
     styled H.form
         [ displayFlex
         , alignItems stretch
-        , backgroundColor defaultTheme.colors.primary
         , color defaultTheme.colors.text
         , padding (em 1)
         , fontSize (px 32)
@@ -92,5 +105,17 @@ button =
         , noOutline
         ]
 
+randomArticleLink =
+    styled H.a 
+    [ color defaultTheme.colors.text
+    , fontSize (em 1)
+    , defaultTheme.fontFamilies
+    , margin (em 1) 
+    , marginBottom (em 2)
+    , display inlineBlock
+    , textDecoration none
+    ]
 
-noOutline = focus [ outline none ]
+
+noOutline =
+    focus [ outline none ]
