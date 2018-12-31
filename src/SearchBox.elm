@@ -1,6 +1,7 @@
 module SearchBox exposing (searchBox)
 
 import Css exposing (..)
+import Css.Transitions
 import Html.Styled as H exposing (Attribute, Html, styled, text)
 import Html.Styled.Attributes exposing (css, href, id, placeholder, target, type_)
 import Html.Styled.Events exposing (onInput, onSubmit)
@@ -90,6 +91,7 @@ input =
         , lineHeight (em 2)
         , borderBottom3 (px 2) solid defaultTheme.colors.text
         , noOutline
+        , highlightFocus
         ]
 
 
@@ -103,19 +105,31 @@ button =
         , lineHeight (em 2)
         , borderBottom3 (px 2) solid defaultTheme.colors.text
         , noOutline
+        , highlightFocus
         ]
 
+
 randomArticleLink =
-    styled H.a 
-    [ color defaultTheme.colors.text
-    , fontSize (em 1)
-    , defaultTheme.fontFamilies
-    , margin (em 1) 
-    , marginBottom (em 2)
-    , display inlineBlock
-    , textDecoration none
-    ]
+    styled H.a
+        [ color defaultTheme.colors.text
+        , fontSize (em 1)
+        , defaultTheme.fontFamilies
+        , margin (em 1)
+        , marginBottom (em 2)
+        , display inlineBlock
+        , textDecoration none
+        , highlightFocus
+        ]
 
 
 noOutline =
     focus [ outline none ]
+
+
+highlightFocus =
+    focus
+        [ backgroundColor (rgba 255 255 255 0.3)
+        , Css.Transitions.transition
+            [ Css.Transitions.backgroundColor3 300 0 Css.Transitions.ease
+            ]
+        ]
