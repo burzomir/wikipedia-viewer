@@ -6,6 +6,7 @@ import Html.Styled.Attributes exposing (css, id, placeholder, type_)
 import Html.Styled.Events exposing (onInput, onSubmit)
 import Icons
 import String exposing (isEmpty)
+import Theme exposing (defaultTheme)
 
 
 type alias Model msg =
@@ -28,7 +29,7 @@ searchBox model =
             , id model.id
             ]
             [ text model.value ]
-        , button [] [ Icons.magnifyingGlass colors.text ]
+        , button [] [ Icons.magnifyingGlass defaultTheme.colors.text ]
         , label labelVisible [] [ text "Search Wikipedia" ]
         ]
 
@@ -37,8 +38,8 @@ form =
     styled H.form
         [ displayFlex
         , alignItems stretch
-        , backgroundColor colors.primary
-        , color colors.text
+        , backgroundColor defaultTheme.colors.primary
+        , color defaultTheme.colors.text
         , padding (em 1)
         , fontSize (px 32)
         , lineHeight (int 2)
@@ -62,7 +63,7 @@ label show =
 
 labelBaseStyle =
     [ position absolute
-    , fontFamilies [ "Arial" ]
+    , defaultTheme.fontFamilies
     ]
 
 
@@ -74,7 +75,7 @@ input =
         , backgroundColor transparent
         , fontSize (em 1)
         , lineHeight (em 2)
-        , borderBottom3 (px 2) solid colors.text
+        , borderBottom3 (px 2) solid defaultTheme.colors.text
         , noOutline
         ]
 
@@ -87,15 +88,9 @@ button =
         , backgroundColor transparent
         , fontSize (em 1.5)
         , lineHeight (em 2)
-        , borderBottom3 (px 2) solid colors.text
+        , borderBottom3 (px 2) solid defaultTheme.colors.text
         , noOutline
         ]
 
-
-colors =
-    { primary = hex "#089CE8"
-    , secondary = hex "#2CA9D2"
-    , text = hex "#FBFBFB"
-    }
 
 noOutline = focus [ outline none ]
