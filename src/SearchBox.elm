@@ -3,7 +3,7 @@ module SearchBox exposing (searchBox)
 import Css exposing (..)
 import Css.Transitions
 import Html.Styled as H exposing (Attribute, Html, styled, text)
-import Html.Styled.Attributes exposing (css, href, id, placeholder, target, type_)
+import Html.Styled.Attributes exposing (css, href, id, placeholder, target, type_, title)
 import Html.Styled.Events exposing (onInput, onSubmit)
 import Icons
 import String exposing (isEmpty)
@@ -33,7 +33,7 @@ searchBox model =
                 , id model.id
                 ]
                 [ text model.value ]
-            , button [] [ Icons.magnifyingGlass defaultTheme.colors.text ]
+            , button [ title ("Search for " ++ model.value)] [ Icons.magnifyingGlass defaultTheme.colors.text ]
             , label labelVisible [] [ text "Search Wikipedia" ]
             ]
         , randomArticleLink
