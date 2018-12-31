@@ -106,6 +106,7 @@ button =
         , borderBottom3 (px 2) solid defaultTheme.colors.text
         , noOutline
         , highlightFocus
+        , cursor pointer
         ]
 
 
