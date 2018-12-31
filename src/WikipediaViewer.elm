@@ -1,4 +1,3 @@
-module Main exposing (Model, Msg(..), PageData, fetchResults, focusSearchBox, getPageUrl, getRandomArticleUrl, getWikiUrl, init, main, resultsList, searchBoxId, searchResultsDecoder, subscriptions, update, view)
 
 import Browser
 import Browser.Dom as Dom
@@ -7,12 +6,10 @@ import Html exposing (Html, a, div, li, p, text, ul)
 import Html.Attributes exposing (href, id, style, target, type_)
 import Html.Events exposing (onInput, onSubmit)
 import Html.Styled exposing (toUnstyled)
-import Http
-import Json.Decode as D
 import SearchBox exposing (searchBox)
 import String.Extra
 import Task
-import Url.Builder exposing (crossOrigin, int, string)
+import Api
 
 
 main =
@@ -46,7 +43,7 @@ init _ =
 type Msg
     = ChangeSearchValue String
     | Search
-    | GotResults (Result Http.Error (List PageData))
+    | GotResults Api.PageDataResults
     | NoOp
 
 
@@ -57,7 +54,7 @@ update msg model =
             ( { model | searchValue = value }, Cmd.none )
 
         Search ->
-            ( { model | searching = True, results = [] }, fetchResults model.searchValue )
+            ( { model | searching = True, results = [] }, Api.fetchResults model.searchValue GotResults )
 
         GotResults results ->
             case results of
@@ -77,7 +74,7 @@ view model =
         [ p
             [ style "textAlign" "center" ]
             [ a
-                [ href getRandomArticleUrl, target "_blank" ]
+                [ href Api.getRandomArticleUrl, target "_blank" ]
                 [ text "Random article" ]
             ]
         , toUnstyled <|
@@ -121,7 +118,7 @@ resultsList results =
         (List.map
             (\pageData ->
                 a
-                    [ href (getPageUrl pageData)
+                    [ href (Api.getPageUrl pageData)
                     , target "_blank"
                     ]
                     [ li
@@ -134,49 +131,3 @@ resultsList results =
             results
         )
 
-
-fetchResults : String -> Cmd Msg
-fetchResults phrase =
-    let
-        url =
-            getWikiUrl
-                [ "w", "api.php" ]
-                [ string "action" "query"
-                , string "format" "json"
-                , string "list" "search"
-                , string "origin" "*"
-                , string "srsearch" phrase
-                ]
-    in
-    Http.get
-        { url = url
-        , expect = Http.expectJson GotResults searchResultsDecoder
-        }
-
-
-searchResultsDecoder : D.Decoder (List PageData)
-searchResultsDecoder =
-    D.at
-        [ "query", "search" ]
-        (D.list
-            (D.map3 PageData
-                (D.field "title" D.string)
-                (D.field "snippet" D.string)
-                (D.field "pageid" D.int)
-            )
-        )
-
-
-getPageUrl : PageData -> String
-getPageUrl pageData =
-    getWikiUrl
-        []
-        [ int "curid" pageData.id ]
-
-
-getWikiUrl =
-    crossOrigin "https://en.wikipedia.org"
-
-
-getRandomArticleUrl =
-    getWikiUrl [ "wiki", "Special:Random" ] []
